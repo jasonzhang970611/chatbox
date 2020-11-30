@@ -1,39 +1,42 @@
 import $ from 'jquery';
 import md5 from 'crypto-js/md5';
+import moment from 'moment';
 
 function createGravatarUrl(username) {
-  let userhash = md5(username);
-  return `http://www.gravatar.com/avatar/${userhash.toString()}`;
+    let userhash = md5(username);
+    return `http://www.gravatar.com/avatar/${userhash.toString()}`;
+
 }
 
 export function promptForUsername() {
     let username = prompt('Enter a username');
     return username.toLowerCase();
-  }
+}
 
 export class ChatForm {
     constructor(formSel, inputSel) {
-      this.$form = $(formSel);
-      this.$input = $(inputSel);
+        this.$form = $(formSel);
+        this.$input = $(inputSel);
     }
 
     init(submitCallback) {
-        this.$form.submit((event) => {
-          event.preventDefault();
-          let val = this.$input.val();
-          submitCallback(val);
-          this.$input.val('');
+        this.$form.on('submit', (event) => {
+            event.preventDefault();
+            let val = this.$input.val();
+            submitCallback(val);
+            this.$input.val('');
         });
-    
-        this.$form.find('button').on('click', () => this.$form.submit());
-      }
-  }
 
-  export class ChatList {
+        this.$form.find('button').on('click', () => this.$form.trigger('submit'));
+    }
+}
+
+export class ChatList {
     constructor(listSel, username) {
       this.$list = $(listSel);
       this.username = username;
     }
+
     drawMessage({user: u, timestamp: t, message: m}) {
         let $messageRow = $('<li>', {
           'class': 'message-row'
@@ -65,10 +68,10 @@ export class ChatForm {
             src: createGravatarUrl(u),
             title: u
         });
-      
+
         $messageRow.append($img);
         $messageRow.append($message);
-        $(this.listId).append($messageRow);
+        this.$list.append($messageRow);
         $messageRow.get(0).scrollIntoView();
       }
 
@@ -82,5 +85,4 @@ export class ChatForm {
           });
         }, 1000);
       }
-
   }
